@@ -1,0 +1,95 @@
+@model TaskListViewModel
+@{
+    ViewData["Title"] = "Завдання";
+}
+<div class="page-header">
+    <div>
+        <div class="eyebrow">Робочий список</div>
+        <h1>Завдання</h1>
+        <p>Пошук, фільтрація, пріоритети, ризики та контроль виконання.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Kanban" class="btn btn-light"><i class="bi bi-kanban"></i> Kanban</a>
+        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+        {
+            <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Створити</a>
+        }
+    </div>
+</div>
+<div class="stats-grid small-stats">
+    <div class="stat-card"><span>Знайдено</span><strong>@Model.TotalCount</strong></div>
+    <div class="stat-card"><span>Активні</span><strong>@Model.ActiveCount</strong></div>
+    <div class="stat-card"><span>Виконані</span><strong>@Model.CompletedCount</strong></div>
+    <div class="stat-card danger"><span>Прострочені</span><strong>@Model.OverdueCount</strong></div>
+</div>
+<div class="panel mt-4">
+    <form method="get" class="filter-grid">
+        <div>
+            <label class="form-label">Пошук</label>
+            <input name="Search" value="@Model.Filter.Search" class="form-control" placeholder="Назва, опис або проєкт" />
+        </div>
+        <div>
+            <label class="form-label">Статус</label>
+            <select name="Status" class="form-select">
+                <option value="">Усі статуси</option>
+                @foreach (var status in Enum.GetValues<TaskItemStatus>())
+                {
+                    <option value="@status" selected='@(Model.Filter.Status == status ? "selected" : null)'>@status.GetDisplayName()</option>
+                }
+            </select>
+        </div>
+        <div>
+            <label class="form-label">Пріоритет</label>
+            <select name="Priority" class="form-select">
+                <option value="">Усі пріоритети</option>
+                @foreach (var priority in Enum.GetValues<TaskPriority>())
+                {
+                    <option value="@priority" selected='@(Model.Filter.Priority == priority ? "selected" : null)'>@priority.GetDisplayName()</option>
+                }
+            </select>
+        </div>
+        <div>
+            <label class="form-label">Виконавець</label>
+            <select name="AssignedToId" class="form-select">
+                <option value="">Усі</option>
+                @foreach (var user in Model.Users)
+                {
+                    <option value="@user.Value" selected='@(Model.Filter.AssignedToId == user.Value ? "selected" : null)'>@user.Text</option>
+                }
+            </select>
+        </div>
+        <div>
+            <label class="form-label">Проєкт</label>
+            <select name="ProjectId" class="form-select">
+                <option value="">Усі</option>
+                @foreach (var project in Model.Projects)
+                {
+                    <option value="@project.Value" selected='@(Model.Filter.ProjectId?.ToString() == project.Value ? "selected" : null)'>@project.Text</option>
+                }
+            </select>
+        </div>
+        <div>
+            <label class="form-label">Сортування</label>
+            <select name="SortBy" class="form-select">
+                <option value="deadline" selected='@(Model.Filter.SortBy == "deadline" ? "selected" : null)'>За дедлайном</option>
+                <option value="priority" selected='@(Model.Filter.SortBy == "priority" ? "selected" : null)'>За пріоритетом</option>
+                <option value="status" selected='@(Model.Filter.SortBy == "status" ? "selected" : null)'>За статусом</option>
+                <option value="project" selected='@(Model.Filter.SortBy == "project" ? "selected" : null)'>За проєктом</option>
+            </select>
+        </div>
+        <div class="d-flex align-items-end gap-2">
+            <button class="btn btn-primary w-100" type="submit">Застосувати</button>
+            <a asp-action="Index" class="btn btn-light">Очистити</a>
+        </div>
+    </form>
+</div>
+<div class="task-grid mt-4">
+    @foreach (var task in Model.Tasks)
+    {
+        <partial name="_TaskCard" model="task" />
+    }
+</div>
+@if (!Model.Tasks.Any())
+{
+    <div class="empty-state mt-4">Завдань за вибраними умовами не знайдено.</div>
+}

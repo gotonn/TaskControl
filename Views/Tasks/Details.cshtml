@@ -1,0 +1,118 @@
+@model TaskDetailsViewModel
+@{
+    ViewData["Title"] = "Деталі завдання";
+}
+<div class="page-header">
+    <div>
+        <div class="eyebrow">Завдання #@Model.Task.Id</div>
+        <h1>@Model.Task.Title</h1>
+        <p>@Model.Task.ProjectName – @Model.Task.TeamName</p>
+    </div>
+    <div class="d-flex gap-2">
+        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+        {
+            <a asp-action="Edit" asp-route-id="@Model.Task.Id" class="btn btn-primary"><i class="bi bi-pencil"></i> Редагувати</a>
+        }
+        <a asp-action="Index" class="btn btn-light">До списку</a>
+    </div>
+</div>
+<div class="row g-4">
+    <div class="col-xl-8">
+        <div class="panel">
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                <span class="status-badge @Model.Task.StatusClass">@Model.Task.StatusLabel</span>
+                <span class="priority-tag @Model.Task.PriorityClass">@Model.Task.PriorityLabel</span>
+                <span class="risk-tag @Model.Task.RiskClass">@Model.Task.RiskLabel</span>
+            </div>
+            <p class="details-text">@Model.FullDescription</p>
+            <div class="progress slim-progress mb-2">
+                <div class="progress-bar" style="width:@Model.Task.ProgressPercent%"></div>
+            </div>
+            <div class="small text-muted">Прогрес виконання: @Model.Task.ProgressPercent%</div>
+        </div>
+        <div class="panel mt-4">
+            <div class="panel-header">
+                <div>
+                    <h2>Коментарі</h2>
+                    <p>Обговорення, уточнення та проміжні результати.</p>
+                </div>
+            </div>
+            <form asp-action="AddComment" method="post" class="comment-form">
+                <input type="hidden" name="id" value="@Model.Task.Id" />
+                <textarea name="text" class="form-control" rows="3" placeholder="Напишіть коментар..."></textarea>
+                <button class="btn btn-primary mt-3" type="submit">Додати коментар</button>
+            </form>
+            <div class="comment-list mt-4">
+                @foreach (var comment in Model.Comments)
+                {
+                    <div class="comment-item">
+                        <div class="avatar small-avatar">@comment.User.FullName.Substring(0, 1)</div>
+                        <div>
+                            <div class="fw-semibold">@comment.User.FullName <span class="text-muted small">@comment.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span></div>
+                            <p>@comment.Text</p>
+                        </div>
+                    </div>
+                }
+                @if (!Model.Comments.Any())
+                {
+                    <div class="empty-state">Коментарів ще немає.</div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4">
+        <div class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Контроль</h2>
+                    <p>Відповідальний, строки та швидка зміна статусу.</p>
+                </div>
+            </div>
+            <div class="details-meta">
+                <div><span>Виконавець</span><strong>@Model.Task.AssignedTo</strong></div>
+                <div><span>Автор</span><strong>@Model.CreatorName</strong></div>
+                <div><span>Дедлайн</span><strong>@Model.Task.Deadline.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</strong></div>
+                <div><span>Оцінка часу</span><strong>@Model.Task.EstimatedHours год</strong></div>
+                <div><span>Створено</span><strong>@Model.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</strong></div>
+            </div>
+            <form asp-action="ChangeStatus" method="post" class="mt-4">
+                <input type="hidden" name="id" value="@Model.Task.Id" />
+                <label class="form-label">Змінити статус</label>
+                <select name="status" class="form-select">
+                    @foreach (var status in Enum.GetValues<TaskItemStatus>())
+                    {
+                        <option value="@status" selected='@(Model.Task.Status == status ? "selected" : null)'>@status.GetDisplayName()</option>
+                    }
+                </select>
+                <button class="btn btn-primary w-100 mt-3" type="submit">Оновити статус</button>
+            </form>
+        </div>
+        <div class="panel mt-4">
+            <div class="panel-header"><h2>Файли</h2></div>
+            @foreach (var file in Model.Attachments)
+            {
+                <div class="file-row"><i class="bi bi-paperclip"></i> @file.FileName</div>
+            }
+            @if (!Model.Attachments.Any())
+            {
+                <div class="empty-state">Файлів ще немає.</div>
+            }
+        </div>
+        <div class="panel mt-4">
+            <div class="panel-header"><h2>Історія змін</h2></div>
+            <div class="timeline">
+                @foreach (var item in Model.History)
+                {
+                    <div class="timeline-item">
+                        <strong>@item.Action</strong>
+                        <span>@item.User.FullName – @item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+                        @if (!string.IsNullOrWhiteSpace(item.NewValue))
+                        {
+                            <p>@item.NewValue</p>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

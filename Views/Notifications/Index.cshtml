@@ -1,0 +1,43 @@
+@model NotificationIndexViewModel
+@{
+    ViewData["Title"] = "Сповіщення";
+}
+<div class="page-header">
+    <div>
+        <div class="eyebrow">Повідомлення</div>
+        <h1>Сповіщення</h1>
+        <p>Нові задачі, зміни статусів, коментарі та контрольні події.</p>
+    </div>
+    <span class="badge bg-primary-subtle text-primary fs-6">@Model.UnreadCount непрочитаних</span>
+</div>
+<div class="panel">
+    <div class="notification-list">
+        @foreach (var item in Model.Notifications)
+        {
+            <div class="notification-item @(item.IsRead ? "" : "unread")">
+                <div class="notification-content">
+                    <strong>@item.Title</strong>
+                    <p>@item.Message</p>
+                    <span>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+                </div>
+                <div class="notification-actions">
+                    @if (item.TaskItemId.HasValue)
+                    {
+                        <a asp-controller="Tasks" asp-action="Details" asp-route-id="@item.TaskItemId" class="btn btn-sm btn-light">Відкрити</a>
+                    }
+                    @if (!item.IsRead)
+                    {
+                        <form asp-action="MarkAsRead" method="post">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button class="btn btn-sm btn-primary" type="submit">Прочитано</button>
+                        </form>
+                    }
+                </div>
+            </div>
+        }
+        @if (!Model.Notifications.Any())
+        {
+            <div class="empty-state">Сповіщень поки немає.</div>
+        }
+    </div>
+</div>

@@ -1,0 +1,27 @@
+@model TeamIndexViewModel
+@{
+    ViewData["Title"] = "Команди";
+}
+<div class="page-header">
+    <div>
+        <div class="eyebrow">Структура роботи</div>
+        <h1>Команди</h1>
+        <p>Перегляд складу команд, активних задач, проєктів і прострочень.</p>
+    </div>
+</div>
+<div class="team-grid">
+    @foreach (var team in Model.Teams)
+    {
+        <a asp-action="Details" asp-route-id="@team.Id" class="team-card">
+            <h2>@team.Name</h2>
+            <p>@team.Description</p>
+            <div class="team-meta">
+                <span><i class="bi bi-person-badge"></i> @team.ManagerName</span>
+                <span><i class="bi bi-people"></i> @team.MembersCount учасників</span>
+                <span><i class="bi bi-folder"></i> @team.ProjectsCount проєктів</span>
+                <span><i class="bi bi-list-task"></i> @team.ActiveTasks активних</span>
+                <span><i class="bi bi-exclamation-triangle"></i> @team.OverdueTasks прострочених</span>
+            </div>
+        </a>
+    }
+</div>

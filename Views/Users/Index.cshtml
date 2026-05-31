@@ -1,0 +1,49 @@
+@model UserDirectoryViewModel
+@{
+    ViewData["Title"] = "Користувачі";
+}
+<div class="page-header">
+    <div>
+        <div class="eyebrow">Команда системи</div>
+        <h1>Користувачі</h1>
+        <p>Профілі, ролі, відділи та статистика виконання задач.</p>
+    </div>
+</div>
+<div class="panel mb-4">
+    <form method="get" class="search-row">
+        <input name="search" value="@Model.Search" class="form-control" placeholder="Пошук за ПІБ, поштою, посадою або відділом" />
+        <button class="btn btn-primary" type="submit">Пошук</button>
+        <a asp-action="Index" class="btn btn-light">Очистити</a>
+    </form>
+</div>
+<div class="panel">
+    <div class="table-responsive">
+        <table class="table align-middle table-hover">
+            <thead>
+            <tr>
+                <th>Користувач</th>
+                <th>Ролі</th>
+                <th>Відділ</th>
+                <th>Активні</th>
+                <th>Виконані</th>
+                <th>Прострочені</th>
+                <th>Стан</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var user in Model.Users)
+            {
+                <tr>
+                    <td><strong>@user.FullName</strong><div class="small text-muted">@user.Email – @user.Position</div></td>
+                    <td>@user.Roles</td>
+                    <td>@user.Department</td>
+                    <td>@user.ActiveTasks</td>
+                    <td>@user.CompletedTasks</td>
+                    <td>@user.OverdueTasks</td>
+                    <td><span class="status-badge @(user.IsActive ? "badge-soft-success" : "badge-soft-secondary")">@(user.IsActive ? "Активний" : "Вимкнений")</span></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

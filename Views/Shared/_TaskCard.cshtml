@@ -1,0 +1,23 @@
+@model TaskCardViewModel
+<div class="task-card">
+    <div class="d-flex justify-content-between gap-2 align-items-start">
+        <div>
+            <a asp-controller="Tasks" asp-action="Details" asp-route-id="@Model.Id" class="task-title">@Model.Title</a>
+            <div class="task-meta mt-1"><i class="bi bi-folder"></i> @Model.ProjectName</div>
+        </div>
+        <span class="status-badge @Model.StatusClass">@Model.StatusLabel</span>
+    </div>
+    <p class="task-description">@Model.Description</p>
+    <div class="progress slim-progress mb-3">
+        <div class="progress-bar" style="width:@Model.ProgressPercent%"></div>
+    </div>
+    <div class="task-tags">
+        <span class="priority-tag @Model.PriorityClass"><i class="bi bi-flag"></i> @Model.PriorityLabel</span>
+        <span class="risk-tag @Model.RiskClass"><i class="bi bi-activity"></i> @Model.RiskLabel</span>
+    </div>
+    <div class="task-footer">
+        <span><i class="bi bi-person"></i> @Model.AssignedTo</span>
+        <span><i class="bi bi-calendar2-week"></i> @Model.Deadline.ToLocalTime().ToString("dd.MM HH:mm")</span>
+        <span><i class="bi bi-chat-left-text"></i> @Model.CommentsCount</span>
+    </div>
+</div>

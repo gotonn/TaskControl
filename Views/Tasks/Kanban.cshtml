@@ -1,0 +1,29 @@
+@model KanbanViewModel
+@{
+    ViewData["Title"] = "Kanban";
+}
+<div class="page-header">
+    <div>
+        <div class="eyebrow">Візуальний контроль</div>
+        <h1>Kanban-дошка</h1>
+        <p>Завдання згруповані за фактичним статусом з урахуванням прострочення.</p>
+    </div>
+    <a asp-action="Index" class="btn btn-light"><i class="bi bi-list-task"></i> Список</a>
+</div>
+<div class="kanban-board">
+    @foreach (var column in Model.Columns)
+    {
+        <div class="kanban-column">
+            <div class="kanban-column-header">
+                <span class="status-badge @column.CssClass">@column.Title</span>
+                <strong>@column.Tasks.Count</strong>
+            </div>
+            <div class="kanban-column-body">
+                @foreach (var task in column.Tasks)
+                {
+                    <partial name="_TaskCard" model="task" />
+                }
+            </div>
+        </div>
+    }
+</div>

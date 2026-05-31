@@ -1,0 +1,36 @@
+@model ProjectIndexViewModel
+@{
+    ViewData["Title"] = "Проєкти";
+}
+<div class="page-header">
+    <div>
+        <div class="eyebrow">Робочі напрями</div>
+        <h1>Проєкти</h1>
+        <p>Кожен проєкт об'єднує задачі, команду, строки та прогрес виконання.</p>
+    </div>
+    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+    {
+        <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Новий проєкт</a>
+    }
+</div>
+<div class="project-grid">
+    @foreach (var project in Model.Projects)
+    {
+        <a asp-action="Details" asp-route-id="@project.ProjectId" class="project-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h2>@project.ProjectName</h2>
+                    <p>@project.TeamName</p>
+                </div>
+                <strong>@project.Progress%</strong>
+            </div>
+            <div class="progress slim-progress mt-3">
+                <div class="progress-bar" style="width:@project.Progress%"></div>
+            </div>
+            <div class="project-card-footer">
+                <span>@project.CompletedTasks / @project.TotalTasks виконано</span>
+                <span>@project.OverdueTasks прострочено</span>
+            </div>
+        </a>
+    }
+</div>

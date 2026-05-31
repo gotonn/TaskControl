@@ -1,0 +1,44 @@
+@{
+    ViewData["Title"] = "Головна";
+}
+<section class="landing">
+    <div class="landing-nav container">
+        <a class="brand landing-brand" asp-controller="Home" asp-action="Index">
+            <span class="brand-mark"><i class="bi bi-check2-square"></i></span>
+            <span>TaskControl</span>
+        </a>
+        <div class="d-flex gap-2">
+            <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary">Увійти</a>
+            <a asp-controller="Account" asp-action="Register" class="btn btn-primary">Створити акаунт</a>
+        </div>
+    </div>
+    <div class="container landing-grid">
+        <div>
+            <span class="pill">Керування завданнями для команд</span>
+            <h1>Створюйте, розподіляйте та контролюйте задачі без хаосу</h1>
+            <p class="lead">TaskControl допомагає бачити відповідальних, дедлайни, ризики, завантаженість виконавців і реальний стан роботи в одному місці.</p>
+            <div class="d-flex flex-wrap gap-3 mt-4">
+                <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-lg">Перейти до системи</a>
+                <a asp-controller="Account" asp-action="Register" class="btn btn-light btn-lg">Зареєструватися</a>
+            </div>
+        </div>
+        <div class="hero-card">
+            <div class="hero-topline">
+                <span>Проєктний огляд</span>
+                <span class="badge bg-success-subtle text-success">78% виконано</span>
+            </div>
+            <div class="hero-stat-grid">
+                <div><strong>72</strong><span>завдання</span></div>
+                <div><strong>6</strong><span>проєктів</span></div>
+                <div><strong>12</strong><span>учасників</span></div>
+                <div><strong>9</strong><span>ризиків</span></div>
+            </div>
+            <div class="kanban-preview">
+                <div><span>Нове</span><em></em><em></em></div>
+                <div><span>У процесі</span><em></em><em></em><em></em></div>
+                <div><span>На перевірці</span><em></em></div>
+                <div><span>Виконано</span><em></em><em></em><em></em></div>
+            </div>
+        </div>
+    </div>
+</section>

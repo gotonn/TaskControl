@@ -1,0 +1,26 @@
+@model ProjectDetailsViewModel
+@{
+    ViewData["Title"] = "Деталі проєкту";
+}
+<div class="page-header">
+    <div>
+        <div class="eyebrow">Проєкт</div>
+        <h1>@Model.Name</h1>
+        <p>@Model.TeamName – @Model.Status.GetDisplayName()</p>
+    </div>
+    <a asp-action="Index" class="btn btn-light">До проєктів</a>
+</div>
+<div class="panel mb-4">
+    <p class="details-text">@Model.Description</p>
+    <div class="row g-3 mt-2">
+        <div class="col-md-4"><div class="metric-box"><span>Прогрес</span><strong>@Model.Progress%</strong></div></div>
+        <div class="col-md-4"><div class="metric-box"><span>Початок</span><strong>@Model.StartDate.ToLocalTime().ToString("dd.MM.yyyy")</strong></div></div>
+        <div class="col-md-4"><div class="metric-box"><span>Завершення</span><strong>@(Model.EndDate?.ToLocalTime().ToString("dd.MM.yyyy") ?? "Не вказано")</strong></div></div>
+    </div>
+</div>
+<div class="task-grid">
+    @foreach (var task in Model.Tasks)
+    {
+        <partial name="_TaskCard" model="task" />
+    }
+</div>

@@ -1,0 +1,102 @@
+@model TaskEditViewModel
+@{
+    ViewData["Title"] = "Редагування завдання";
+}
+<div class="page-header">
+    <div>
+        <div class="eyebrow">Оновлення задачі</div>
+        <h1>Редагування завдання</h1>
+        <p>Змініть відповідального, дедлайн, статус, пріоритет або прогрес.</p>
+    </div>
+    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-light">До деталей</a>
+</div>
+<div class="row g-4">
+    <div class="col-xl-8">
+        <div class="panel">
+            <form asp-action="Edit" method="post">
+                <input asp-for="Id" type="hidden" />
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label"></label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger small"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label"></label>
+                    <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+                    <span asp-validation-for="Description" class="text-danger small"></span>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="ProjectId" class="form-label"></label>
+                        <select asp-for="ProjectId" class="form-select">
+                            @foreach (var project in Model.Projects)
+                            {
+                                <option value="@project.Value">@project.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="AssignedToId" class="form-label"></label>
+                        <select asp-for="AssignedToId" class="form-select">
+                            @foreach (var user in Model.Users)
+                            {
+                                <option value="@user.Value">@user.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Priority" class="form-label"></label>
+                        <select asp-for="Priority" asp-items="Html.GetEnumSelectList<TaskPriority>()" class="form-select"></select>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Status" class="form-label"></label>
+                        <select asp-for="Status" asp-items="Html.GetEnumSelectList<TaskItemStatus>()" class="form-select"></select>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="EstimatedHours" class="form-label"></label>
+                        <input asp-for="EstimatedHours" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Deadline" class="form-label"></label>
+                        <input asp-for="Deadline" type="datetime-local" class="form-control" value="@Model.Deadline.ToString("yyyy-MM-ddTHH:mm")" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="ProgressPercent" class="form-label">Прогрес, %</label>
+                        <input asp-for="ProgressPercent" class="form-range" type="range" min="0" max="100" />
+                        <div class="small text-muted">Поточне значення: <span id="progressValue">@Model.ProgressPercent</span>%</div>
+                    </div>
+                </div>
+                <div class="d-flex gap-2 mt-4">
+                    <button class="btn btn-primary" type="submit">Зберегти зміни</button>
+                    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-light">Скасувати</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="col-xl-4">
+        <div class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Підказка розподілу</h2>
+                    <p>Менш завантажені користувачі показані вище.</p>
+                </div>
+            </div>
+            <div class="stack-list">
+                @foreach (var user in Model.Suggestions)
+                {
+                    <button type="button" class="suggestion-card" data-user-id="@user.UserId">
+                        <div>
+                            <strong>@user.FullName</strong>
+                            <span>@user.ActiveTasks активних, @user.OverdueTasks прострочених</span>
+                        </div>
+                        <span class="level-pill @user.LevelClass">@user.Level</span>
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,161 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Панель керування";
+}
+<div class="page-header">
+    <div>
+        <div class="eyebrow">Огляд роботи</div>
+        <h1>Панель керування</h1>
+        <p>Поточний стан задач, дедлайнів, ризиків і завантаженості команди.</p>
+    </div>
+    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+    {
+        <a asp-controller="Tasks" asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Нове завдання</a>
+    }
+</div>
+<div class="stats-grid">
+    <div class="stat-card"><span>Усі завдання</span><strong>@Model.TotalTasks</strong><i class="bi bi-list-task"></i></div>
+    <div class="stat-card"><span>Активні</span><strong>@Model.ActiveTasks</strong><i class="bi bi-lightning-charge"></i></div>
+    <div class="stat-card"><span>Виконані</span><strong>@Model.CompletedTasks</strong><i class="bi bi-check2-circle"></i></div>
+    <div class="stat-card danger"><span>Прострочені</span><strong>@Model.OverdueTasks</strong><i class="bi bi-exclamation-triangle"></i></div>
+</div>
+<div class="row g-4 mt-1">
+    <div class="col-xl-7">
+        <div class="panel h-100">
+            <div class="panel-header">
+                <div>
+                    <h2>Найближчі дедлайни</h2>
+                    <p>Завдання, які варто перевірити першими.</p>
+                </div>
+                <a asp-controller="Tasks" asp-action="Index" class="btn btn-sm btn-light">Всі задачі</a>
+            </div>
+            <div class="stack-list">
+                @foreach (var task in Model.NearestDeadlines)
+                {
+                    <div class="stack-item">
+                        <div>
+                            <a asp-controller="Tasks" asp-action="Details" asp-route-id="@task.Id" class="fw-semibold">@task.Title</a>
+                            <div class="small text-muted">@task.AssignedTo – @task.ProjectName</div>
+                        </div>
+                        <div class="text-end">
+                            <span class="status-badge @task.StatusClass">@task.StatusLabel</span>
+                            <div class="small text-muted mt-1">@task.Deadline.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-5">
+        <div class="panel h-100">
+            <div class="panel-header">
+                <div>
+                    <h2>Ризики</h2>
+                    <p>Завдання з високим ризиком прострочення.</p>
+                </div>
+                <span class="badge bg-danger-subtle text-danger">@Model.HighRiskTasks</span>
+            </div>
+            <div class="stack-list">
+                @foreach (var task in Model.RiskyTasks)
+                {
+                    <div class="stack-item compact">
+                        <div>
+                            <a asp-controller="Tasks" asp-action="Details" asp-route-id="@task.Id" class="fw-semibold">@task.Title</a>
+                            <div class="small text-muted">Прогрес: @task.ProgressPercent%</div>
+                        </div>
+                        <span class="risk-tag @task.RiskClass">@task.RiskLabel</span>
+                    </div>
+                }
+                @if (!Model.RiskyTasks.Any())
+                {
+                    <div class="empty-state">Критичних ризиків немає.</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row g-4 mt-1">
+    <div class="col-xl-7">
+        <div class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Прогрес проєктів</h2>
+                    <p>Виконання задач у межах активних напрямів.</p>
+                </div>
+            </div>
+            <div class="project-progress-list">
+                @foreach (var item in Model.ProjectProgress)
+                {
+                    <div class="project-row">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <a asp-controller="Projects" asp-action="Details" asp-route-id="@item.ProjectId" class="fw-semibold">@item.ProjectName</a>
+                                <div class="small text-muted">@item.TeamName – @item.CompletedTasks з @item.TotalTasks виконано</div>
+                            </div>
+                            <strong>@item.Progress%</strong>
+                        </div>
+                        <div class="progress slim-progress mt-2">
+                            <div class="progress-bar" style="width:@item.Progress%"></div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-5">
+        <div class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Показники</h2>
+                    <p>Загальна ефективність виконання.</p>
+                </div>
+            </div>
+            <div class="completion-ring">
+                <div><strong>@Model.CompletionRate%</strong><span>виконано</span></div>
+            </div>
+            <div class="mini-metrics">
+                <span>Проєкти: <b>@Model.ProjectsCount</b></span>
+                <span>Команди: <b>@Model.TeamsCount</b></span>
+                <span>Користувачі: <b>@Model.UsersCount</b></span>
+            </div>
+        </div>
+    </div>
+</div>
+@if (Model.Workloads.Any())
+{
+    <div class="panel mt-4">
+        <div class="panel-header">
+            <div>
+                <h2>Завантаженість виконавців</h2>
+                <p>Система оцінює активні задачі, прострочення, критичні пріоритети та залишок годин.</p>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table align-middle table-hover">
+                <thead>
+                <tr>
+                    <th>Користувач</th>
+                    <th>Активні</th>
+                    <th>На перевірці</th>
+                    <th>Прострочені</th>
+                    <th>Години</th>
+                    <th>Рівень</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var user in Model.Workloads)
+                {
+                    <tr>
+                        <td><strong>@user.FullName</strong><div class="small text-muted">@user.Position</div></td>
+                        <td>@user.ActiveTasks</td>
+                        <td>@user.ReviewTasks</td>
+                        <td>@user.OverdueTasks</td>
+                        <td>@user.EstimatedHours</td>
+                        <td><span class="level-pill @user.LevelClass">@user.Level</span></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

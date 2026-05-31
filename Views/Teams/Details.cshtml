@@ -1,0 +1,52 @@
+@model TeamDetailsViewModel
+@{
+    ViewData["Title"] = "Деталі команди";
+}
+<div class="page-header">
+    <div>
+        <div class="eyebrow">Команда</div>
+        <h1>@Model.Name</h1>
+        <p>@Model.Description</p>
+    </div>
+    <a asp-action="Index" class="btn btn-light">До команд</a>
+</div>
+<div class="stats-grid small-stats">
+    <div class="stat-card"><span>Учасники</span><strong>@Model.MembersCount</strong></div>
+    <div class="stat-card"><span>Проєкти</span><strong>@Model.ProjectsCount</strong></div>
+    <div class="stat-card"><span>Активні задачі</span><strong>@Model.ActiveTasks</strong></div>
+    <div class="stat-card danger"><span>Прострочені</span><strong>@Model.OverdueTasks</strong></div>
+</div>
+<div class="row g-4 mt-1">
+    <div class="col-xl-6">
+        <div class="panel">
+            <div class="panel-header"><h2>Учасники та навантаження</h2></div>
+            <div class="stack-list">
+                @foreach (var member in Model.Members)
+                {
+                    <div class="stack-item">
+                        <div>
+                            <strong>@member.FullName</strong>
+                            <div class="small text-muted">@member.Position</div>
+                        </div>
+                        <span class="level-pill @member.LevelClass">@member.Level</span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div class="panel">
+            <div class="panel-header"><h2>Проєкти команди</h2></div>
+            @foreach (var project in Model.Projects)
+            {
+                <div class="project-row">
+                    <div class="d-flex justify-content-between">
+                        <a asp-controller="Projects" asp-action="Details" asp-route-id="@project.ProjectId" class="fw-semibold">@project.ProjectName</a>
+                        <strong>@project.Progress%</strong>
+                    </div>
+                    <div class="progress slim-progress mt-2"><div class="progress-bar" style="width:@project.Progress%"></div></div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
